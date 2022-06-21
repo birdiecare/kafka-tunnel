@@ -62,6 +62,7 @@ class AWSMSKInstances:
 
         hosts = hosts_as_string.split(',')
         host_as_string = hosts[0].split('.')
+        host_as_string.pop(0)
         connection_hosts = []
         i = 1
         while i <= cluster_info['NumberOfBrokerNodes']:
