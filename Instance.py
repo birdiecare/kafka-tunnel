@@ -53,7 +53,6 @@ class AWSMSKInstances:
         client = self.session.client('kafka')
         cluster_info = client.describe_cluster(ClusterArn=cluster_arn)['ClusterInfo']
         brokers_info = client.get_bootstrap_brokers(ClusterArn=cluster_arn)
-        print(brokers_info)
 
         hosts_as_string = ""
         if 'BootstrapBrokerString' in brokers_info:
@@ -61,7 +60,16 @@ class AWSMSKInstances:
         if 'BootstrapBrokerStringSaslScram' in brokers_info:
             hosts_as_string = brokers_info['BootstrapBrokerStringSaslScram']
 
-        hosts_as_string = hosts_as_string + "," + cluster_info['ZookeeperConnectString']
+        hosts = hosts_as_string.split(',')
+        host_as_string = hosts[0].split('.')
+        connection_hosts = []
+        i = 1
+        while i <= cluster_info['NumberOfBrokerNodes']:
+            connection_hosts.append("b-" + str(i)+"."+".".join(host_as_string))
+            i += 1
+
+        hosts_as_string = ",".join(connection_hosts) + "," + cluster_info['ZookeeperConnectString']
+
         instances = []
         for row in hosts_as_string.split(','):
             [host, port] = row.split(':')
