@@ -14,7 +14,7 @@ def cli():
 @click.argument('jump_host')
 @click.option('-zp','--zookeeper_port',default='2181')
 @click.option('-kp','--kafka_port',default='9092')
-@click.option('-r','--region',default='ap-southeast-2')
+@click.option('-r','--region',default='eu-west-2')
 @click.option('-p','--profile',default='default')
 def aws(jump_host,zookeeper_port,kafka_port,region,profile):
     instances=[]
@@ -47,10 +47,12 @@ def manual(jump_host,zookeeper_ips, kafka_ips, schemaregistry_ips, zookeeper_por
 @cli.command(help='Provide the ARN of your AWS MSK cluster')
 @click.argument('jump_host')
 @click.argument('cluster_arn')
-@click.option('-r','--region',default=os.environ['AWS_DEFAULT_REGION'])
-@click.option('-p','--profile',default=os.environ['AWS_PROFILE'])
+@click.option('-r','--region',default='eu-west-2')
+@click.option('-p','--profile',default='default')
 def msk(jump_host, cluster_arn, region, profile):
-    msk = AWSMSKInstances(profile, region)
+    msk = AWSMSKInstances(region)
+    if profile != "default":
+        msk.set_aws_profile(profile)
     connect(jump_host, msk.get_instances(cluster_arn))
 
 def connect(jump_host,instances):
